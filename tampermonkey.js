@@ -1,23 +1,19 @@
-// ==UserScript== im Browser
-// @name          DSO Karten
-// @namespace     http://tampermonkey.net/
-// @version       2.0
-// @description  Overlay mit Map-Auswahl, Panning, Zoom, Resize und Local Storage.
-// @author        Dafi (Adapted by AI)
-// @match         https://www.diesiedleronline.de/de/spielen
-// @grant         none
+// ==UserScript==
+// @name          DSO Karten - 3
+// @namespace     http://tampermonkey.net/
+// @version       2.3
+// @description   Overlay mit Map-Auswahl, Panning, Zoom, Resize - Browser-Cache optimiert
+// @author        Dafi
+// @match         https://www.diesiedleronline.de/de/startseite
+// @grant         none
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    // *******************************************************************
-    // ** ⚠️ KONFIGURATION ⚠️ **
-    // *******************************************************************
-    // Basis-URL Ihrer GitHub-Repo (Muss mit / enden, z.B. für "assets/maps/...")
+    // ============= CONFIG =============
     const BASE_MAP_URL = 'https://raw.githubusercontent.com/VolkanSah/DSO-Karten/refs/heads/main/';
 
-    // JSON-Daten der Karten (als String)
     const MAP_JSON_STRING = `
     {
         "map_loader": [
@@ -67,7 +63,7 @@
             {"at_loader_name": "Regionen", "at_img": "assets/maps/regionen.jpg"},
             {"at_loader_name": "Rettet das Weihnachtsfest", "at_img": "assets/maps/rettetdasweichnachtsfest-Blank.jpg"},
             {"at_loader_name": "Riesenkampf", "at_img": "assets/maps/riesenkampf.jpg"},
-            {"at_loader_name": "Rotkäppchen", "at_img": "assets/maps//rotkaeppchen_2025.jpg"},
+            {"at_loader_name": "Rotkäppchen", "at_img": "assets/maps/rotkaeppchen_2025.jpg"},
             {"at_loader_name": "Rückkehr ins Räubernest", "at_img": "assets/maps/rueckkehrinsraeubernest-Blank.jpg"},
             {"at_loader_name": "Sattelfest", "at_img": "assets/maps/sattelfest-Blank.jpg"},
             {"at_loader_name": "Schießpulver", "at_img": "assets/maps/schiesspulver-Blank.jpg"},
@@ -86,7 +82,7 @@
             {"at_loader_name": "Eine neue Erfahrung", "at_img": "assets/maps/eine-neue-erfahrung.jpg"},
             {"at_loader_name": "Held gesucht", "at_img": "assets/maps/held-gesucht.jpg"},
             {"at_loader_name": "Herz des Waldes", "at_img": "assets/maps/herz-des-waldes.jpg"},
-            {"at_loader_name": "nichts besonderes", "at_img": "assets/maps/nichts-besonderes.jpg"},
+            {"at_loader_name": "Nichts besonderes", "at_img": "assets/maps/nichts-besonderes.jpg"},
             {"at_loader_name": "Retro Stil", "at_img": "assets/maps/retro-stil.jpg"},
             {"at_loader_name": "Sturmhilfe", "at_img": "assets/maps/sturmhilfe.jpg"},
             {"at_loader_name": "Woher kommen die Ostereier", "at_img": "assets/maps/woher-kommen-die-ostereier.jpg"},
@@ -96,11 +92,8 @@
             {"at_loader_name": "Halbfinale", "at_img": "assets/maps/halbfinale.jpg"},
             {"at_loader_name": "Viertelfinale", "at_img": "assets/maps/viertelfinale.jpg"},
             {"at_loader_name": "Achtelfinale", "at_img": "assets/maps/achtelfinale.jpg"},
-            {"at_loader_name": "Das betrogene Schneiderlein", "at_img": "assets/maps/das-betrogene-schneiderlein.jpg"},
             {"at_loader_name": "Arktische Explosion", "at_img": "assets/maps/arktische-explosion.jpg"},
-            {"at_loader_name": "Der schlafende Vulkan", "at_img": "assets/maps/der-schlafende-vulkan.jpg"},
             {"at_loader_name": "Der verschollene Schädel", "at_img": "assets/maps/der-verschollene-schaedel.jpg"},
-            {"at_loader_name": "Die schwarzen Priester", "at_img": "assets/maps/die-schwarzen-priester.jpg"},
             {"at_loader_name": "Gefängnisinsel", "at_img": "assets/maps/gefaengnisinsel.jpg"},
             {"at_loader_name": "Piratenleben", "at_img": "assets/maps/piratenleben.jpg"},
             {"at_loader_name": "Schlummerndes Riff", "at_img": "assets/maps/schlummerndes-riff.jpg"},
@@ -110,7 +103,6 @@
             {"at_loader_name": "Die Freibeuter-Razzia", "at_img": "assets/maps/die-freibeuter-razzia.jpg"},
             {"at_loader_name": "Geteilte Stadt im Herbst", "at_img": "assets/maps/geteilte-stadt-im-herbst.jpg"},
             {"at_loader_name": "Geteilte Stadt im Sommer", "at_img": "assets/maps/geteilte-stadt-im-sommer.jpg"},
-            {"at_loader_name": "Grabräuber", "at_img": "assets/maps/grabraeuber.jpg"},
             {"at_loader_name": "Jagd auf die Jäger", "at_img": "assets/maps/jagd-auf-die-jaeger.jpg"},
             {"at_loader_name": "Seeufer-Schatz", "at_img": "assets/maps/seeufer-schatz.jpg"},
             {"at_loader_name": "Der Wirbelwind", "at_img": "assets/maps/der-wirbelwind.jpg"}
@@ -119,16 +111,14 @@
 
     const MAP_DATA = JSON.parse(MAP_JSON_STRING).map_loader;
 
-    // *******************************************************************
-    // ** HTML-STRUKTUR **
-    // *******************************************************************
+    // ============= HTML =============
     const html = `
         <div id="community-overlay">
             <div id="overlay-resize-handle"></div>
             <div id="overlay-header">
                 <div class="header-left">
                     <span class="overlay-title">Taktikkarte Viewer</span>
-                    <span class="overlay-version">v2.0</span>
+                    <span class="overlay-version">v2.3</span>
                 </div>
                 <div class="header-right">
                     <button id="overlay-reset-map" title="Zoom und Position zurücksetzen">⟳</button>
@@ -142,15 +132,13 @@
                     <select id="map-selector"></select>
                 </div>
                 <div id="map-container">
-                    <img id="tactic-map" src="" alt="Taktikkarte" title="Mausrad: Zoom, Ziehen: Verschieben">
+                    <img id="tactic-map" src="" alt="Taktikkarte" title="Mausrad: Zoom | Ziehen: Verschieben">
                 </div>
             </div>
         </div>
     `;
 
-    // *******************************************************************
-    // ** CSS-STILE **
-    // *******************************************************************
+    // ============= CSS =============
     const css = `
         #community-overlay {
             position: fixed;
@@ -208,8 +196,13 @@
         .overlay-version { font-size: 0.8em; color: #72767d; }
 
         .header-right button {
-            background: none; border: none; color: #72767d; cursor: pointer;
-            padding: 2px 6px; font-size: 16px; border-radius: 3px;
+            background: none;
+            border: none;
+            color: #72767d;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 16px;
+            border-radius: 3px;
             line-height: 1;
         }
         .header-right button:hover { background: #40444b; color: #ffffff; }
@@ -255,16 +248,12 @@
             min-height: 100%;
             transform-origin: 0 0;
             transition: none;
-            pointer-events: none; /* Wichtig, damit mousedown/mousemove Events an den Container gehen */
+            pointer-events: none;
         }
     `;
 
-    // *******************************************************************
-    // ** JAVASCRIPT LOGIK **
-    // *******************************************************************
-
+    // ============= MAIN LOGIC =============
     function initializeOverlay() {
-        // --- Setup ---
         const styleElement = document.createElement('style');
         styleElement.textContent = css;
         document.head.appendChild(styleElement);
@@ -273,7 +262,6 @@
         overlayContainer.innerHTML = html;
         document.body.appendChild(overlayContainer);
 
-        // --- DOM Elemente abrufen ---
         const overlay = document.getElementById('community-overlay');
         const header = document.getElementById('overlay-header');
         const minimizeBtn = document.getElementById('overlay-minimize');
@@ -285,13 +273,10 @@
         const tacticMap = document.getElementById('tactic-map');
         const mapSelector = document.getElementById('map-selector');
 
-
-        // --- Event Isolation Helper ---
         function preventEventBubbling(e) {
             e.stopPropagation();
         }
 
-        // --- Zustandsvariablen ---
         let mapState = {
             x: parseFloat(localStorage.getItem('mapX') || '0'),
             y: parseFloat(localStorage.getItem('mapY') || '0'),
@@ -311,34 +296,27 @@
 
         let initialX, initialY, initialW, initialH;
 
-        // Initial position & size setzen
         overlay.style.transform = `translate3d(${overlayCurrentX}px, ${overlayCurrentY}px, 0)`;
         overlay.style.width = `${overlayCurrentW}px`;
         overlay.style.height = `${overlayCurrentH}px`;
 
-        // --- Local Storage Funktionen ---
-
         function saveMapState() {
-             localStorage.setItem('mapX', mapState.x.toString());
-             localStorage.setItem('mapY', mapState.y.toString());
-             localStorage.setItem('mapZoom', mapState.zoom.toString());
-             localStorage.setItem('selectedMap', mapState.selectedMap);
+            localStorage.setItem('mapX', mapState.x.toString());
+            localStorage.setItem('mapY', mapState.y.toString());
+            localStorage.setItem('mapZoom', mapState.zoom.toString());
+            localStorage.setItem('selectedMap', mapState.selectedMap);
         }
 
         function applyMapTransform() {
-            // Skalierung und Verschiebung werden kombiniert. Wichtig: Die Übersetzung (x/y) muss durch den Zoom-Faktor geteilt werden,
-            // da die Skalierung bereits auf die Verschiebung angewendet wird.
             tacticMap.style.transform = `scale(${mapState.zoom}) translate3d(${mapState.x / mapState.zoom}px, ${mapState.y / mapState.zoom}px, 0)`;
         }
 
-        // --- Map Lade- und Steuerungslogik ---
-
         function resetMapPosition(resetZoom = false) {
-             mapState.x = 0;
-             mapState.y = 0;
-             if (resetZoom) mapState.zoom = 1.0;
-             applyMapTransform();
-             saveMapState();
+            mapState.x = 0;
+            mapState.y = 0;
+            if (resetZoom) mapState.zoom = 1.0;
+            applyMapTransform();
+            saveMapState();
         }
 
         function populateMapSelector() {
@@ -349,15 +327,13 @@
                 mapSelector.appendChild(option);
             });
 
-            // Initialen Zustand setzen
             mapSelector.value = mapState.selectedMap;
-            loadSelectedMap(false); // Beim Start nicht zurücksetzen
+            loadSelectedMap(false);
         }
 
         function loadSelectedMap(reset = true) {
             const currentSelected = mapSelector.value;
 
-            // Wenn die Karte gewechselt wird UND reset = true ist, Pan/Zoom zurücksetzen
             if (mapState.selectedMap !== currentSelected && reset) {
                 resetMapPosition(true);
             } else {
@@ -368,8 +344,6 @@
             tacticMap.src = BASE_MAP_URL + mapState.selectedMap;
             saveMapState();
         }
-
-        // --- Pan (Drag Karte) Logik ---
 
         function startMapDragging(e) {
             if (e.button !== 0) return;
@@ -386,16 +360,13 @@
         function applyMapBounds(newX, newY) {
             const containerW = mapContainer.clientWidth;
             const containerH = mapContainer.clientHeight;
-            // Bildgröße nach Zoom
             const mapW = tacticMap.naturalWidth * mapState.zoom;
             const mapH = tacticMap.naturalHeight * mapState.zoom;
 
-            // X-Achse begrenzen: Verschiebung darf maximal 0 sein und minimal (Containerbreite - Bildbreite)
             const maxX = 0;
             const minX = Math.min(0, containerW - mapW);
             mapState.x = Math.max(Math.min(newX, maxX), minX);
 
-            // Y-Achse begrenzen
             const maxY = 0;
             const minY = Math.min(0, containerH - mapH);
             mapState.y = Math.max(Math.min(newY, maxY), minY);
@@ -422,8 +393,6 @@
             }
         }
 
-        // --- Zoom Logik ---
-
         function handleMapZoom(e) {
             preventEventBubbling(e);
             e.preventDefault();
@@ -431,31 +400,25 @@
             const zoomDelta = e.deltaY * -0.001;
             const oldZoom = mapState.zoom;
 
-            // Neuen Zoom berechnen und begrenzen (Min 0.1, Max 5.0)
             mapState.zoom = Math.max(0.1, Math.min(5.0, oldZoom + zoomDelta));
 
-            // Zoom-Fokus auf Mausposition beibehalten
             const containerRect = mapContainer.getBoundingClientRect();
             const mouseX = e.clientX - containerRect.left;
             const mouseY = e.clientY - containerRect.top;
 
-            // Pan-Korrektur
             mapState.x = mouseX - (mouseX - mapState.x) * (mapState.zoom / oldZoom);
             mapState.y = mouseY - (mouseY - mapState.y) * (mapState.zoom / oldZoom);
 
-            // Nach dem Zoomen Begrenzungen erneut anwenden
             applyMapBounds(mapState.x, mapState.y);
 
             applyMapTransform();
             saveMapState();
         }
 
-        // --- Overlay Drag Logik ---
-
         function startOverlayDragging(e) {
             preventEventBubbling(e);
             if (e.target === header || (e.target.closest('#overlay-header') && !e.target.closest('.header-right'))) {
-                 if (!isMapDragging && !isResizing) {
+                if (!isMapDragging && !isResizing) {
                     isOverlayDragging = true;
                     initialX = e.clientX - overlayCurrentX;
                     initialY = e.clientY - overlayCurrentY;
@@ -483,8 +446,6 @@
             }
         }
 
-        // --- Resize Logik ---
-
         function startResizing(e) {
             preventEventBubbling(e);
             isResizing = true;
@@ -495,7 +456,7 @@
         }
 
         function handleResizing(e) {
-             if (isResizing) {
+            if (isResizing) {
                 preventEventBubbling(e);
                 const dx = e.clientX - initialX;
                 const dy = e.clientY - initialY;
@@ -506,7 +467,6 @@
                 overlay.style.width = `${overlayCurrentW}px`;
                 overlay.style.height = `${overlayCurrentH}px`;
 
-                // Wichtig: Begrenzungen der Karte nach Resize neu berechnen
                 applyMapBounds(mapState.x, mapState.y);
                 applyMapTransform();
             } else if (isOverlayDragging) {
@@ -517,7 +477,7 @@
         }
 
         function stopResizingOrDragging(e) {
-             if (isResizing) {
+            if (isResizing) {
                 preventEventBubbling(e);
                 isResizing = false;
                 localStorage.setItem('overlayW', overlayCurrentW.toString());
@@ -529,53 +489,47 @@
             }
         }
 
-        // --- Event Listener Registrierung ---
-
-        // Overlay Events
         header.addEventListener('mousedown', startOverlayDragging, { passive: false });
         resizeHandle.addEventListener('mousedown', startResizing, { passive: false });
         document.addEventListener('mousemove', handleResizing, { passive: false });
         document.addEventListener('mouseup', stopResizingOrDragging, { passive: false });
 
-        // Map Events
         mapContainer.addEventListener('mousedown', startMapDragging, { passive: false });
         mapContainer.addEventListener('wheel', handleMapZoom, { passive: false });
         resetMapBtn.addEventListener('click', (e) => {
-             preventEventBubbling(e);
-             resetMapPosition(true);
+            preventEventBubbling(e);
+            resetMapPosition(true);
         });
         mapSelector.addEventListener('change', () => loadSelectedMap(true));
 
-        // UI Events
         let isMinimized = false;
         minimizeBtn.addEventListener('click', (e) => {
             preventEventBubbling(e);
             isMinimized = !isMinimized;
-            content.style.display = isMinimized ? 'none' : 'flex';
-            overlay.style.height = isMinimized ? '40px' : `${overlayCurrentH}px`;
-            minimizeBtn.textContent = isMinimized ? '□' : '_';
+            if (isMinimized) {
+                content.style.display = 'none';
+                overlay.style.height = '40px';
+                minimizeBtn.textContent = '□';
+            } else {
+                content.style.display = 'flex';
+                overlay.style.height = `${overlayCurrentH}px`;
+                minimizeBtn.textContent = '_';
+            }
         });
 
         closeBtn.addEventListener('click', (e) => {
             preventEventBubbling(e);
             overlay.remove();
-            // Aufräumen des Local Storage
-            ['overlayX', 'overlayY', 'overlayW', 'overlayH', 'mapX', 'mapY', 'mapZoom', 'selectedMap'].forEach(key => localStorage.removeItem(key));
         });
 
-        // Global Event Prevention
         overlay.addEventListener('mousedown', preventEventBubbling, { passive: false });
         overlay.addEventListener('selectstart', preventEventBubbling, { passive: false });
         overlay.addEventListener('dragstart', preventEventBubbling, { passive: false });
 
-
-        // ** START DER ANWENDUNG **
         populateMapSelector();
-        // Initiales Anwenden der Begrenzungen, falls die gespeicherte Position außerhalb liegt
         applyMapBounds(mapState.x, mapState.y);
         applyMapTransform();
     }
 
-    // Overlay starten
     initializeOverlay();
 })();
