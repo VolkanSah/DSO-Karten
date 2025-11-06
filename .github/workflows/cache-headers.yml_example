@@ -1,0 +1,10 @@
+name: Set Cache Headers
+on: [push]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy with headers
+        run: |
+          echo "Cache-Control: public, max-age=31536000, immutable" >> assets/maps/.htaccess
