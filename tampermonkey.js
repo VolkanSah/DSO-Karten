@@ -71,7 +71,7 @@
             {"at_loader_name": "Rückkehr ins Räubernest", "at_img": "assets/maps/rueckkehrinsraeubernest-Blank.jpg"},
             {"at_loader_name": "Sattelfest", "at_img": "assets/maps/sattelfest-Blank.jpg"},
             {"at_loader_name": "Schießpulver", "at_img": "assets/maps/schiesspulver-Blank.jpg"},
-            {"at_loader_name": "Schneewittchen", "at_img": "assets/maps/schneewittchen-Blank.jpg"},
+            {"at_loader_name": "Schneewittchen", "at_img": "assets/maps/schneewittchen.jpg"},
             {"at_loader_name": "Schritt voraus", "at_img": "assets/maps/schrittvoraus-Blank.jpg"},
             {"at_loader_name": "Schwarzen Ritter", "at_img": "assets/maps/schwarzenritter-Blank.jpg"},
             {"at_loader_name": "Seeuferschatz", "at_img": "assets/maps/seeuferschatz-Blank.jpg"},
