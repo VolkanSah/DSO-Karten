@@ -3,7 +3,7 @@
 // @namespace     http://tampermonkey.net/
 // @version       2.0
 // @description  Overlay mit Map-Auswahl, Panning, Zoom, Resize und Local Storage.
-// @author        YourName (Adapted by AI)
+// @author        Dafi (Adapted by AI)
 // @match         https://www.diesiedleronline.de/de/spielen
 // @grant         none
 // ==/UserScript==
