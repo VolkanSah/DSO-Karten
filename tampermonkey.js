@@ -3,7 +3,7 @@
 // @namespace     http://tampermonkey.net/
 // @version       2.0
 // @description  Overlay mit Map-Auswahl, Panning, Zoom, Resize und Local Storage.
-// @author        YourName (Adapted by AI)
+// @author        Moep (Udapted by AI)
 // @match         https://www.diesiedleronline.de/de/startseite
 // @grant         none
 // ==/UserScript==
