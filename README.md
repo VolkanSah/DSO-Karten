@@ -1,1 +1,1 @@
-Ein einfacher  DSO Karten Overlay. 😃
+Ein einfaches overlay für deine DSO karten
