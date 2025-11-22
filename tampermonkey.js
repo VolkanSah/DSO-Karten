@@ -15,7 +15,7 @@
     // ** ⚠️ KONFIGURATION ⚠️ **
     // *******************************************************************
     // Basis-URL Ihrer GitHub-Repo (Muss mit / enden, z.B. für "assets/maps/...")
-    const BASE_MAP_URL = 'https://raw.githubusercontent.com/VolkanSah/DSO-Karten/refs/heads/main/';
+    const BASE_MAP_URL = 'https://raw.githubusercontent.com/koeniglichepost/DSO-Karten/refs/heads/main/';
 
     // JSON-Daten der Karten (als String)
     const MAP_JSON_STRING = `
